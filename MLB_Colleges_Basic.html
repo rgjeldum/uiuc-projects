@@ -21,8 +21,8 @@
 <script type="text/javascript">
 
 var diameter = 500, //max size of the bubbles
-    color    = d3.scale.category20b(); //color category
-
+    //v3 color    = d3.scale.category20b(); //color category
+	color = d3.scaleOrdinal(d3.schemeCategory10);	// v4
 var bubble = d3.layout.pack()
     .sort(null)
     .size([diameter, diameter])
