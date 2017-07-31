@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MLB - Colleges by State</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+</head>
+
+<style type="text/css">
+	/* No style rules here yet */		
+</style>
+
+<body>
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Dashboard</a>
+    </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+      <li><a href="Description.html">About the Visualization</a></li>
+      <li><a href="Choropleth_Example.html">Top College States</a></li>
+      <li><a href="Horizontal_Bar_Chart.html">Top 10 Colleges</a></li>
+      <li><a href="Animated_Donut_Chart.html">Top NCAA Divisions</a></li>
+    </ul>
+  </div>
+</nav>
+
+<form>
+    <label><input type="radio" name="dataset" id="dataset" value="total" checked>   MLB Players (1871-2016)</label>
+    <label><input type="radio" name="dataset" id="dataset" value="option1">   MLB Players (1960-1999)</label>
+    <label><input type="radio" name="dataset" id="dataset" value="option2">   MLB Players (2000-2016)</label>
+</form>
+
+
+<div class="container2">
+  <h3>U.S. States where MLB Players played college baseball</h3>
+  <p><sp>Do MLB Players favor playing at colleges located in warm-weather states? Select a different time period to see the change in demographics.</p>
+</div>
+
+
+</div>
+	</div>
+		<div class="container4">
+			<div class="col-lg-12 text-right" >
+				<a href="Horizontal_Bar_Chart.html">
+				<button type="button" class="btn btn-default btn-small btn-primary">
+					<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>Next
+				</button></a>
+		</div>
+	</div>
+</div><!-- /.container -->
+
+<script type="text/javascript">
+
+/*
+	This visualization was made possible by modifying code provided by:
+	
+	Scott Murray, Choropleth example from "Interactive Data Visualization for the Web" 	https://github.com/alignedleft/d3-book/blob/master/chapter_12/05_choropleth.html	*/
+
+			// RJG ORIGINAL Width and height
+			//var w = 500;
+			//var h = 300;
+
+			// experimental Width and height
+			var w = 700;
+			var h = 400;
+
+			//Define map projection
+			var projection = d3.geo.albersUsa()
+								   .translate([w/2, h/2])
+								   .scale([800]);	// RJG: size of map
+
+			//Define path generator
+			var path = d3.geo.path()
+							 .projection(projection);
+							 
+			//Define quantize scale to sort data values into buckets of color
+			var color = d3.scale.quantize()
+								// RJG: original Greeinsh .range(["rgb(237,248,233)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"]);
+								.range(["#fef0d9","#fdd49e","#fdbb84","#fc8d59","#ef6548","#d7301f","#990000"]);
+								//Colors taken from colorbrewer.js, included in the D3 download
+
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+	
+		
+// NOT USED - SAVE DATA FOR OTHER CHART
+// MLB Players from 1871-2016
+var datasetStateTotals_1871_2016 =
+	[
+	{state:"AL", state_fullname:"Alabama", player_count:158},
+	{state:"AK", state_fullname:"Alaska", player_count:0},
+	{state:"AZ", state_fullname:"Arizona", player_count:170},
+	{state:"AR", state_fullname:"Arkansas", player_count:64},
+	{state:"CA", state_fullname:"California", player_count:452},
+	{state:"CO", state_fullname:"Colorado", player_count:16},
+	{state:"CT", state_fullname:"Connecticut", player_count:64},
+	{state:"DE", state_fullname:"Delaware", player_count:14},
+	{state:"FL", state_fullname:"Florida", player_count:282},
+	{state:"GA", state_fullname:"Georgia", player_count:120},
+	{state:"HI", state_fullname:"Hawaii", player_count:13},
+	{state:"ID", state_fullname:"Idaho", player_count:7},
+	{state:"IL", state_fullname:"Illinois", player_count:143},
+	{state:"IN", state_fullname:"Indiana", player_count:118},
+	{state:"IA", state_fullname:"Iowa", player_count:63},
+	{state:"KS", state_fullname:"Kansas", player_count:73},
+	{state:"KY", state_fullname:"Kentucky", player_count:76},
+	{state:"LA", state_fullname:"Louisiana", player_count:179},
+	{state:"ME", state_fullname:"Maine", player_count:13},
+	{state:"MD", state_fullname:"Maryland", player_count:22},
+	{state:"MA", state_fullname:"Massachusetts", player_count:170},
+	{state:"MI", state_fullname:"Michigan", player_count:183},
+	{state:"MN", state_fullname:"Minnesota", player_count:36},
+	{state:"MS", state_fullname:"Mississippi", player_count:128},
+	{state:"MO", state_fullname:"Missouri", player_count:46},
+	{state:"MT", state_fullname:"Montana", player_count:0},
+	{state:"NE", state_fullname:"Nebraska", player_count:17},
+	{state:"NV", state_fullname:"Nevada", player_count:0},
+	{state:"NH", state_fullname:"New Hampshire", player_count:31},
+	{state:"NJ", state_fullname:"New Jersey", player_count:72},
+	{state:"NM", state_fullname:"New Mexico", player_count:11},
+	{state:"NY", state_fullname:"New York", player_count:188},
+	{state:"NC", state_fullname:"North Carolina", player_count:265},
+	{state:"ND", state_fullname:"North Dakota", player_count:1},
+	{state:"OH", state_fullname:"Ohio", player_count:173},
+	{state:"OK", state_fullname:"Oklahoma", player_count:96},
+	{state:"OR", state_fullname:"Oregon", player_count:62},
+	{state:"PA", state_fullname:"Pennsylvania", player_count:265},
+	{state:"RI", state_fullname:"Rhode Island", player_count:47},
+	{state:"SC", state_fullname:"South Carolina", player_count:162},
+	{state:"SD", state_fullname:"South Dakota", player_count:2},
+	{state:"TN", state_fullname:"Tennessee", player_count:134},
+	{state:"TX", state_fullname:"Texas", player_count:430},
+	{state:"UT", state_fullname:"Utah", player_count:34},
+	{state:"VT", state_fullname:"Vermont", player_count:14},
+	{state:"VA", state_fullname:"Virginia", player_count:123},
+	{state:"WA", state_fullname:"Washington", player_count:76},
+	{state:"WV", state_fullname:"West Virginia", player_count:44},
+	{state:"WI", state_fullname:"Wisconsin", player_count:8},
+	{state:"WY", state_fullname:"Wyoming", player_count:7}
+    ];
+
+// NOT USED - SAVE DATA FOR OTHER CHART
+// MLB Players from 1960-1999
+var datasetStateTotals_1960_1999 =
+	[
+	{state:"AL", state_fullname:"Alabama", player_count:79},
+	{state:"AK", state_fullname:"Alaska", player_count:0},
+	{state:"AZ", state_fullname:"Arizona", player_count:131},
+	{state:"AR", state_fullname:"Arkansas", player_count:33},
+	{state:"CA", state_fullname:"California", player_count:302},
+	{state:"CO", state_fullname:"Colorado", player_count:11},
+	{state:"CT", state_fullname:"Connecticut", player_count:31},
+	{state:"DE", state_fullname:"Delaware", player_count:6},
+	{state:"FL", state_fullname:"Florida", player_count:204},
+	{state:"GA", state_fullname:"Georgia", player_count:54},
+	{state:"HI", state_fullname:"Hawaii", player_count:11},
+	{state:"ID", state_fullname:"Idaho", player_count:3},
+	{state:"IL", state_fullname:"Illinois", player_count:83},
+	{state:"IN", state_fullname:"Indiana", player_count:49},
+	{state:"IA", state_fullname:"Iowa", player_count:30},
+	{state:"KS", state_fullname:"Kansas", player_count:48},
+	{state:"KY", state_fullname:"Kentucky", player_count:48},
+	{state:"LA", state_fullname:"Louisiana", player_count:114},
+	{state:"ME", state_fullname:"Maine", player_count:2},
+	{state:"MD", state_fullname:"Maryland", player_count:3},
+	{state:"MA", state_fullname:"Massachusetts", player_count:32},
+	{state:"MI", state_fullname:"Michigan", player_count:96},
+	{state:"MN", state_fullname:"Minnesota", player_count:23},
+	{state:"MS", state_fullname:"Mississippi", player_count:63},
+	{state:"MO", state_fullname:"Missouri", player_count:22},
+	{state:"MT", state_fullname:"Montana", player_count:0},
+	{state:"NE", state_fullname:"Nebraska", player_count:14},
+	{state:"NV", state_fullname:"Nevada", player_count:0},
+	{state:"NH", state_fullname:"New Hampshire", player_count:7},
+	{state:"NJ", state_fullname:"New Jersey", player_count:30},
+	{state:"NM", state_fullname:"New Mexico", player_count:7},
+	{state:"NY", state_fullname:"New York", player_count:43},
+	{state:"NC", state_fullname:"North Carolina", player_count:111},
+	{state:"ND", state_fullname:"North Dakota", player_count:0},
+	{state:"OH", state_fullname:"Ohio", player_count:89},
+	{state:"OK", state_fullname:"Oklahoma", player_count:71},
+	{state:"OR", state_fullname:"Oregon", player_count:30},
+	{state:"PA", state_fullname:"Pennsylvania", player_count:48},
+	{state:"RI", state_fullname:"Rhode Island", player_count:5},
+	{state:"SC", state_fullname:"South Carolina", player_count:87},
+	{state:"SD", state_fullname:"South Dakota", player_count:0},
+	{state:"TN", state_fullname:"Tennessee", player_count:65},
+	{state:"TX", state_fullname:"Texas", player_count:222},
+	{state:"UT", state_fullname:"Utah", player_count:29},
+	{state:"VT", state_fullname:"Vermont", player_count:1},
+	{state:"VA", state_fullname:"Virginia", player_count:62},
+	{state:"WA", state_fullname:"Washington", player_count:49},
+	{state:"WV", state_fullname:"West Virginia", player_count:11},
+	{state:"WI", state_fullname:"Wisconsin", player_count:1},
+	{state:"WY", state_fullname:"Wyoming", player_count:5}
+	];
+
+// NOT USED - SAVE DATA FOR OTHER CHART
+// MLB Players from 2000-2016
+var datasetStateTotals_2000_2016 =
+	[
+	{state:"AL", state_fullname:"Alabama", player_count:26},
+	{state:"AK", state_fullname:"Alaska", player_count:0},
+	{state:"AZ", state_fullname:"Arizona", player_count:35},
+	{state:"AR", state_fullname:"Arkansas", player_count:9},
+	{state:"CA", state_fullname:"California", player_count:78},
+	{state:"CO", state_fullname:"Colorado", player_count:0},
+	{state:"CT", state_fullname:"Connecticut", player_count:7},
+	{state:"DE", state_fullname:"Delaware", player_count:1},
+	{state:"FL", state_fullname:"Florida", player_count:70},
+	{state:"GA", state_fullname:"Georgia", player_count:29},
+	{state:"HI", state_fullname:"Hawaii", player_count:2},
+	{state:"ID", state_fullname:"Idaho", player_count:0},
+	{state:"IL", state_fullname:"Illinois", player_count:10},
+	{state:"IN", state_fullname:"Indiana", player_count:19},
+	{state:"IA", state_fullname:"Iowa", player_count:0},
+	{state:"KS", state_fullname:"Kansas", player_count:14},
+	{state:"KY", state_fullname:"Kentucky", player_count:13},
+	{state:"LA", state_fullname:"Louisiana", player_count:40},
+	{state:"ME", state_fullname:"Maine", player_count:0},
+	{state:"MD", state_fullname:"Maryland", player_count:1},
+	{state:"MA", state_fullname:"Massachusetts", player_count:7},
+	{state:"MI", state_fullname:"Michigan", player_count:11},
+	{state:"MN", state_fullname:"Minnesota", player_count:3},
+	{state:"MS", state_fullname:"Mississippi", player_count:26},
+	{state:"MO", state_fullname:"Missouri", player_count:11},
+	{state:"MT", state_fullname:"Montana", player_count:0},
+	{state:"NE", state_fullname:"Nebraska", player_count:2},
+	{state:"NV", state_fullname:"Nevada", player_count:0},
+	{state:"NH", state_fullname:"New Hampshire", player_count:1},
+	{state:"NJ", state_fullname:"New Jersey", player_count:6},
+	{state:"NM", state_fullname:"New Mexico", player_count:4},
+	{state:"NY", state_fullname:"New York", player_count:11},
+	{state:"NC", state_fullname:"North Carolina", player_count:47},
+	{state:"ND", state_fullname:"North Dakota", player_count:1},
+	{state:"OH", state_fullname:"Ohio", player_count:29},
+	{state:"OK", state_fullname:"Oklahoma", player_count:15},
+	{state:"OR", state_fullname:"Oregon", player_count:14},
+	{state:"PA", state_fullname:"Pennsylvania", player_count:8},
+	{state:"RI", state_fullname:"Rhode Island", player_count:0},
+	{state:"SC", state_fullname:"South Carolina", player_count:47},
+	{state:"SD", state_fullname:"South Dakota", player_count:1},
+	{state:"TN", state_fullname:"Tennessee", player_count:30},
+	{state:"TX", state_fullname:"Texas", player_count:98},
+	{state:"UT", state_fullname:"Utah", player_count:2},
+	{state:"VT", state_fullname:"Vermont", player_count:0},
+	{state:"VA", state_fullname:"Virginia", player_count:23},
+	{state:"WA", state_fullname:"Washington", player_count:9},
+	{state:"WV", state_fullname:"West Virginia", player_count:5},
+	{state:"WI", state_fullname:"Wisconsin", player_count:0},
+	{state:"WY", state_fullname:"Wyoming", player_count:0}
+	];
+
+change(datasetStateTotals_1871_2016);
+
+d3.selectAll("input")
+	.on("change", selectDataset);
+	
+function selectDataset()
+{
+	var value = this.value;
+	if (value == "total")
+	{
+		change(datasetStateTotals_1871_2016);
+	}
+	else if (value == "option1")
+	{
+		change(datasetStateTotals_1960_1999);
+	}
+	else if (value == "option2")
+	{
+		change(datasetStateTotals_2000_2016);
+	}
+}
+
+
+function change(data) {
+
+	// Load in player count data for each state
+	// RJG d3.csv(aFileName, function(data) {
+
+	// console.log(data);
+				
+	//Set input domain for color scale
+	color.domain([
+		d3.min(data, function(d) { return d.player_count; }), 
+		d3.max(data, function(d) { return d.player_count; })
+	]);
+
+	//Load in GeoJSON data
+	d3.json("us-states.json", function(json) {
+
+		//Merge the MLB data and GeoJSON
+		//Loop through once for each MLB data value
+		for (var i = 0; i < data.length; i++) {
+				
+			//Grab state name
+			var dataState = data[i].state_fullname;
+						
+			//Grab data value, and convert from string to float
+			var dataValue = parseFloat(data[i].player_count);
+				
+			//Find the corresponding state inside the GeoJSON
+			for (var j = 0; j < json.features.length; j++) {
+						
+				var jsonState = json.features[j].properties.name;
+				
+				if (dataState == jsonState) {
+						
+					//Copy the data value into the JSON
+					json.features[j].properties.value = dataValue;
+								
+					//Stop looking through the JSON
+					break;
+								
+				}
+			}		
+		}
+
+		//Bind data and create one path per GeoJSON feature
+		svg.selectAll("path")
+				.data(json.features)
+				.enter()
+				.append("path")
+				.attr("d", path)
+				.style("fill", function(d) {
+					//Get data value
+					var value = d.properties.value;
+					   		
+					if (value) {
+						//If value exists…
+						return color(value);
+					} else {
+						//If value is undefined…
+						return "#ccc";
+					}
+				})
+
+				.on("mouseover", function(d) {
+					
+					//Get this bar's x/y values, then augment for the tooltip
+					//var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand() / 2;
+					//var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+					var xPosition = parseFloat(d3.select(this).attr("x")+300);
+					var yPosition = parseFloat(d3.select(this).attr("y")+140);
+					//var xPosition = parseFloat(d3.select(this).attr("x")+d3.event.pageX);
+					//var yPosition = parseFloat(d3.select(this).attr("y")+d3.event.pageY);
+
+					//Create the tooltip label
+					svg.append("text")
+							.attr("id", "tooltip")
+							.attr("x", xPosition)
+							.attr("y", yPosition)
+							.attr("text-anchor", "middle")
+							.attr("font-family", "sans-serif")
+							.attr("font-size", "11px")
+							.attr("font-weight", "bold")
+							.attr("fill", "black")
+							//.text(d.properties.name + "\nNum of players = " + d.properties.value);
+							//.text(d.properties.name);
+							.text(d.properties.name + ": " + d.properties.value + " players");	// tooltip (hover)
+						
+				})
+				.on("mouseout", function() {
+			   	
+					//Remove the tooltip
+					d3.select("#tooltip").remove();
+				})
+	});		
+}	
+		</script>
+	</body>
+</html>
+
